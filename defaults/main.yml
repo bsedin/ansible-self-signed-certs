@@ -1,0 +1,13 @@
+---
+self_signed_certs_dir: /etc/ssl
+self_signed_certs_key_size: 4096
+self_signed_certs_key_cipher: aes256
+self_signed_certs: []
+# For example:
+# self_signed_certs:
+#   - fqdn: domain.io
+#   - fqdn: your.domain.io
+#     key_size: 2048
+#   - fqdn: your.domain.io
+#     key_passphrase: pbtrkhxEbKWJ7Xpe
+#     key_cipher: aes256

@@ -1,0 +1,30 @@
+---
+- name: install python-openssl
+  apt: name=python-openssl
+
+- name: ensure ssl directory
+  file: dest={{ self_signed_certs_dir }} state=directory
+
+- name: generate private keys
+  openssl_privatekey:
+    path: '{{ self_signed_certs_dir }}/{{ item.fqdn }}.key'
+    size: '{{ item.key_size | default(self_signed_certs_key_size) }}'
+    passphrase: '{{ item.key_passphrase | default("") }}'
+    cipher: '{{ item.key_cipher | default(self_signed_certs_key_cipher) }}'
+  with_items: '{{ self_signed_certs }}'
+
+- name: generate certificate signing requests
+  openssl_csr:
+    path: '{{ self_signed_certs_dir }}/{{ item.fqdn }}.csr'
+    privatekey_path: '{{ self_signed_certs_dir }}/{{ item.fqdn }}.key'
+    privatekey_passphrase: '{{ item.key_passphrase | default("") }}'
+    common_name: '{{ item.fqdn }}'
+  with_items: '{{ self_signed_certs }}'
+
+- name: generate a self signed certificates
+  openssl_certificate:
+    path: '{{ self_signed_certs_dir }}/{{ item.fqdn }}.crt'
+    privatekey_path: '{{ self_signed_certs_dir }}/{{ item.fqdn }}.key'
+    csr_path: '{{ self_signed_certs_dir }}/{{ item.fqdn }}.csr'
+    provider: selfsigned
+  with_items: '{{ self_signed_certs }}'
